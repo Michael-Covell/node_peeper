@@ -23,6 +23,7 @@ def describe_network(graph_list,graph_names=None):
         	graph_name = g.name
         else:
             graph_name = graph_names[i]
+        print(graph_name," - Current Time =", datetime.now().strftime("%#I:%M"))
 
         num_edges = g.number_of_edges()
         num_nodes = g.number_of_nodes()
@@ -40,39 +41,53 @@ def describe_network(graph_list,graph_names=None):
                         '#nodes':[num_nodes],
                         'avg_degree':[avg_degree],
                         'density':[density],
-                        'reciprocity':[reciprocity]
+                        'reciprocity':[reciprocity],
                         'diameter':[diameter],
                         'radius':[radius],
                         'avg_geo_distance':[avg_geo_distance],
                         },
                     index=[graph_name])
         d = pd.concat([d,d_temp])
+    "Current Time =", datetime.now().strftime("%#I:%M")
     return d
 
 #*********************************************
-def reach(graph_list,graph_names=None):
+def cohesion(graph_list,graph_names=None):
     d = pd.DataFrame()
     for i,g in enumerate(graph_list):
         if graph_names == None:
             graph_name = g.name
         else:
             graph_name = graph_names[i]
+        print(graph_name," - Current Time =", datetime.now().strftime("%#I:%M"))
 
+        k_connectivity = nx.node_connectivity(g)
         try:
-            clustering_coef = nx.average_clustering(g)
+            pairwise_connectivities = list(nx.all_pairs_node_connectivity(g).values())
+            connectivity_list = [np.median(list(pc.values())) for pc in pairwise_connectivities]
+            median_pairwise_connectivity = np.median(connectivity_list)
+        except Exception as e:
+            median_pairwise_connectivity = e
+        try:
+            avg_clustering_coef = nx.average_clustering(g)
         except Exception as e:
             clustering_coef = e
         try:
             transitivity = nx.transitivity(g)
         except Exception as e:
             transitivity = e
+        k_core_number = nx.core_number(g)
 
-        d_temp = pd.DataFrame({                               
-                                'clustering_coef':[clustering_coef],
-                                'transitivity':[transitivity],
+        d_temp = pd.DataFrame({
+                                'k_connectivity':[k_connectivity],
+                                'median_pairwise_connectivity':[median_pairwise_connectivity],
+                                'avg_clustering_coef':[avg_clustering_coef],
+                                'transitivity':[transitivity],#global clustering coefficient
+                                'k_core_number':k_core_number
                                 },
                             index=[graph_name])
         d = pd.concat([d,d_temp])
+    "Current Time =", datetime.now().strftime("%#I:%M")
     return d
 
 #*********************************************
