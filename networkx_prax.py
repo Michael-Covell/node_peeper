@@ -71,7 +71,7 @@ def cohesion(graph_list,graph_names=None):
         try:
             avg_clustering_coef = nx.average_clustering(g)
         except Exception as e:
-            clustering_coef = e
+            avg_clustering_coef = e
         try:
             transitivity = nx.transitivity(g)
         except Exception as e:
